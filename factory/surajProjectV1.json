@@ -1,0 +1,12 @@
+{
+	"name": "surajProjectV1",
+	"properties": {
+		"globalParameters": {
+			"job_id": {
+				"type": "string",
+				"value": "201"
+			}
+		}
+	},
+	"location": "eastus"
+}
