@@ -1,0 +1,12 @@
+{
+	"name": "AzureDatabricksDeltaLake1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLake",
+		"typeProperties": {
+			"domain": "https://adb-1576510439679610.10.azuredatabricks.net",
+			"clusterId": "0727-194151-6w54y4rf",
+			"workspaceResourceId": "/subscriptions/5985151e-3f79-42ce-ba79-de4b74ea9ba7/resourceGroups/suraj_pro_RG/providers/Microsoft.Databricks/workspaces/sur_pro"
+		}
+	}
+}
