@@ -16,103 +16,41 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "SqlServerSource",
-						"sqlReaderQuery": "select TABLE_CATALOG,TABLE_NAME from INFORMATION_SCHEMA.TABLES",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"type": "AzureDatabricksDeltaLakeSource",
+						"query": {
+							"value": "@concat('select * from hive_metastore.metadata_schema.tbl_parameters as param,hive_metastore.metadata_schema.tbl_source_control as control where param.job_id=',pipeline().globalParameters.job_id)",
+							"type": "Expression"
+						}
 					},
 					"dataset": {
-						"referenceName": "SqlServerTable1",
+						"referenceName": "AzureDatabricksDeltaLakeDataset1",
 						"type": "DatasetReference"
-					},
-					"firstRowOnly": false
-				}
-			},
-			{
-				"name": "ForEach1",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Lookup1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
 					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Lookup1').output.value",
-						"type": "Expression"
-					},
-					"activities": [
-						{
-							"name": "Copy data1",
-							"type": "Copy",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "SqlServerSource",
-									"sqlReaderQuery": {
-										"value": "@{concat('select * from ',item().TABLE_SCHEMA,'.',item().TABLE_NAME)}",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"sink": {
-									"type": "DelimitedTextSink",
-									"storeSettings": {
-										"type": "AzureBlobFSWriteSettings",
-										"copyBehavior": "PreserveHierarchy"
-									},
-									"formatSettings": {
-										"type": "DelimitedTextWriteSettings",
-										"quoteAllText": true,
-										"fileExtension": ".txt"
-									}
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "SqlServerTable1",
-									"type": "DatasetReference"
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DelimitedText2",
-									"type": "DatasetReference",
-									"parameters": {
-										"file": {
-											"value": "@item().TABLE_NAME",
-											"type": "Expression"
-										}
-									}
-								}
-							]
-						}
-					]
 				}
 			}
 		],
 		"annotations": []
+	},
+	"type": "Lookup",
+	"policy": {
+		"timeout": "0.12:00:00",
+		"retry": 0,
+		"retryIntervalInSeconds": 30,
+		"secureOutput": false,
+		"secureInput": false
+	},
+	"typeProperties": {
+		"source": {
+			"type": "AzureDatabricksDeltaLakeSource",
+			"query": {
+				"value": "@concat('select * from hive_metastore.metadata_schema.tbl_parameters as param,hive_metastore.metadata_schema.tbl_source_control as control where param.job_id=',pipeline().parameters.job_id)",
+				"type": "Expression"
+			}
+		},
+		"dataset": {
+			"referenceName": "AzureDatabricksDeltaLakeDataset1",
+			"type": "DatasetReference"
+		},
+		"firstRowOnly": false
 	}
 }
