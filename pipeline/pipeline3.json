@@ -321,9 +321,15 @@
 										}
 									}
 								},
-								"fieldList": [],
+								"fieldList": [
+									"lastModified"
+								],
 								"storeSettings": {
 									"type": "GoogleCloudStorageReadSettings",
+									"modifiedDatetimeStart": {
+										"value": "@activity('metadata lookup').output.firstRow.watermark_column",
+										"type": "Expression"
+									},
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -925,6 +931,8 @@
 			{
 				"name": "pipeline success email",
 				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "For each source file",
