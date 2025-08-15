@@ -26,7 +26,7 @@
 						"referenceName": "AzureDatabricksDeltaLakeDataset1",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
@@ -51,9 +51,22 @@
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "DelimitedText3",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"bucket": {
+								"value": "@activity('metadata lookup').output.firstRow.gcp_source_bucket\n",
+								"type": "Expression"
+							},
+							"folder": {
+								"value": "@activity('metadata lookup').output.firstRow.source_file_path\r\n",
+								"type": "Expression"
+							},
+							"file": "*"
+						}
 					},
-					"fieldList": [],
+					"fieldList": [
+						"childItems"
+					],
 					"storeSettings": {
 						"type": "GoogleCloudStorageReadSettings",
 						"recursive": true,
@@ -99,12 +112,9 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"notebookPath": "/databricks-notebooks/log_record_tbl_insert",
+								"notebookPath": "/databricks_notebook/log_record_tbl_insert",
 								"baseParameters": {
-									"env": {
-										"value": "@pipeline().globalParameters.env",
-										"type": "Expression"
-									},
+									"env": "dev",
 									"pipeLineName": {
 										"value": "@pipeline().Pipeline",
 										"type": "Expression"
@@ -293,23 +303,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataset": {
-									"referenceName": "DelimitedText4",
-									"type": "DatasetReference"
-								},
-								"fieldList": [],
-								"storeSettings": {
-									"type": "GoogleCloudStorageReadSettings",
-									"recursive": true,
-									"modifiedDatetimeStart": {
-										"value": "@activity('metadata lookup').output.firstRow.watermark_column",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+								"fieldList": []
 							}
 						},
 						{
@@ -820,20 +814,9 @@
 			{
 				"name": "pipeline in progress email",
 				"type": "WebActivity",
-				"dependsOn": [
-					{
-						"activity": "metadata lookup",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "caputure pipline start time",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -857,6 +840,8 @@
 			{
 				"name": "caputure pipline start time",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
