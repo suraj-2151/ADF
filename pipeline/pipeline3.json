@@ -326,10 +326,6 @@
 								],
 								"storeSettings": {
 									"type": "GoogleCloudStorageReadSettings",
-									"modifiedDatetimeStart": {
-										"value": "@activity('metadata lookup').output.firstRow.watermark_column",
-										"type": "Expression"
-									},
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
