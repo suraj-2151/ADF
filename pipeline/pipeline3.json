@@ -303,7 +303,32 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"fieldList": []
+								"dataset": {
+									"referenceName": "DelimitedText3",
+									"type": "DatasetReference",
+									"parameters": {
+										"bucket": {
+											"value": "@activity('metadata lookup').output.firstRow.gcp_source_bucket\n",
+											"type": "Expression"
+										},
+										"folder": {
+											"value": "@activity('metadata lookup').output.firstRow.source_file_path\n",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [],
+								"storeSettings": {
+									"type": "GoogleCloudStorageReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
 							}
 						},
 						{
@@ -337,12 +362,59 @@
 										"type": "DelimitedTextReadSettings"
 									}
 								},
-								"enableStaging": false
-							}
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DelimitedText3",
+									"type": "DatasetReference",
+									"parameters": {
+										"bucket": {
+											"value": "@activity('metadata lookup').output.firstRow.gcp_source_bucket\n",
+											"type": "Expression"
+										},
+										"folder": {
+											"value": "@activity('metadata lookup').output.firstRow.source_file_path\n",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DelimitedText5",
+									"type": "DatasetReference"
+								}
+							]
 						},
 						{
 							"name": "file copy success log",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "gcp to azure",
@@ -397,6 +469,8 @@
 						{
 							"name": "file copy failed log",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "gcp to azure",
@@ -451,6 +525,8 @@
 						{
 							"name": "update watermark column",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "trigger 1c pipeline",
@@ -488,6 +564,8 @@
 						{
 							"name": "trigger 1b pipeline",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "gcp to azure",
@@ -501,26 +579,14 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"metadata_lookup_values": {
-										"value": "@activity('metadata lookup').output.firstRow",
-										"type": "Expression"
-									},
-									"source_file_last_modified_time": {
-										"value": "@activity('Get file last modified date').output.lastModified",
-										"type": "Expression"
-									},
-									"source_file_name": {
-										"value": "@item().name",
-										"type": "Expression"
-									}
-								}
+								"waitOnCompletion": true
 							}
 						},
 						{
 							"name": "watermark update success log",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "update watermark column",
@@ -575,6 +641,8 @@
 						{
 							"name": "watermark update failure log",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "update watermark column",
@@ -629,6 +697,8 @@
 						{
 							"name": "archive storage files",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "trigger 1b pipeline",
@@ -674,6 +744,8 @@
 						{
 							"name": "archive success log",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "archive storage files",
@@ -728,6 +800,8 @@
 						{
 							"name": "archive failure log",
 							"type": "DatabricksNotebook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "archive storage files",
@@ -782,6 +856,8 @@
 						{
 							"name": "trigger 1c pipeline",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "trigger 1b pipeline",
@@ -795,17 +871,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"metadata_lookup_values": {
-										"value": "@activity('metadata lookup').output.firstRow",
-										"type": "Expression"
-									},
-									"source_file_last_modified_time": {
-										"value": "@activity('Get file last modified date').output.lastModified",
-										"type": "Expression"
-									}
-								}
+								"waitOnCompletion": true
 							}
 						}
 					]
